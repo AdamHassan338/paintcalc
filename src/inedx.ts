@@ -1,13 +1,41 @@
 import prompt from 'prompt-sync';
-type wall = {
-    width: number;
-    height: number;
+
+type Wall = {
+    width?: number;
+    height?: number;
+    area? : number;
+    colour? : string;
+    excludeWidth? : number;
+    excludeHeight? : number;
+    excludeArea? : number;
 }
+
+const syncPrompt = prompt();
 
 const litersPerMetet2 = 0.1;
 
+
+let colours: Array<[key: string, value: number]> = [
+    ["white", 0],
+    ["peach", 0],
+    ["red", 0],
+    ["blue", 0]
+  ];
+
+let walls : Array<Wall> = [];
+
+
+function isValidColour(colour:string) : boolean {
+
+    for(let i = 0; i< colours.length; i++){
+        if(colours[i][0]===colour)
+            return true;
+    }
+    return false;
+}
+
 let totalPaint = 0;
-const syncPrompt = prompt();
+
 
 function calculatePaintForWall(width : number,height : number): number {
     let area : number = width * height;
@@ -16,18 +44,22 @@ function calculatePaintForWall(width : number,height : number): number {
 
 }
 
+function area(width : number, height : number) : number {
+    return width*height;
+}
+
 function getInteger(promptMessage: string): number {
     let isValid = false;
     let number;
 
-    while (!isValid) {
+    while (true) {
 
         const input: string = syncPrompt(promptMessage);
         number = parseInt(input, 10);
 
         if (!isNaN(number)) {
             if(number>0)
-                isValid = true;
+                return number;
             else
                 console.log('please Enter a number larger than 0.');
         } else {
@@ -35,22 +67,36 @@ function getInteger(promptMessage: string): number {
         }
     }
 
+
     return -1;
 }
 
 function getBool(promptMessage: string) : boolean {
     let isValid = false;
 
-    while(!isValid){
+    while(true){
         const input: string = syncPrompt(promptMessage).toUpperCase();
         if ( input === "YES" )
             return true;
         if( input === "NO" )
             return false;
-        console.log("Please enter a Yes or No. ")
+        console.log("Please enter a Yes or No. ");
     }
 
     return false;
+}
+
+function getColour(promptMessage : string) : string {
+
+    /* TO DO */
+    /* print the colour options */
+    while(true){
+        const input : string = syncPrompt(promptMessage).toLowerCase();
+        if(isValidColour(input))
+            return input;
+        console.log("please enter a valid colour");
+    }
+    return"";
 }
 
 
@@ -60,16 +106,35 @@ function getBool(promptMessage: string) : boolean {
         //get size of wall
         //get exclude area
 function run(){
-    //let test : boolean = getBool("Do you like fruits? ");
-    let rooms : number =getInteger('How manny rooms will you paint? ')
-    for(let i = 0; i <rooms ; i++){
-        let walls : number = getInteger(`How manny walls will you paint in room ${i+1} `)
 
+    let rooms : number = getInteger('How manny rooms will you paint? ');
+    console.log(rooms);
+    for(let i = 0; i <rooms ; i++){
+        let walls : number = getInteger(`How manny walls will you paint in room ${i+1} `);
+        let sameColour : boolean = getBool(`Will you paint all walls in room ${i+1} the same colour? [YES,NO] `);
+        let colour : string = "";
+        let colourindex : number = -1;
+
+        if(sameColour){
+            colour = getColour(`What colour will you paint this room? `);
+            colourindex = colours.findIndex(([k, _]) => k === colour);
+        }
+        
         for(let j = 0; j< walls ; j++){
-            let width : number = getInteger(`what is the width of wall ${j+1} `);
-            let height : number = getInteger(`what is the height of wall ${j+1} `);
-            
-            totalPaint+= calculatePaintForWall(width,height);
+            let wall : Wall = {}
+            wall.width  = getInteger(`what is the width of wall ${j+1} `);
+            wall.height = getInteger(`what is the height of wall ${j+1} `);
+
+            if(!sameColour){
+                colour = getColour("What colour will you paint this wall? ")
+                colourindex = colours.findIndex(([k, _]) => k === colour);
+
+            }
+            wall.colour = colour;
+            colours[colourindex][1] += area(wall.width,wall.height);
+
+            totalPaint+= calculatePaintForWall(wall.width,wall.height);            
+
         }
 
     }
