@@ -110,7 +110,7 @@ function run(){
     let rooms : number = getInteger('How manny rooms will you paint? ');
     console.log(rooms);
     for(let i = 0; i <rooms ; i++){
-        let walls : number = getInteger(`How manny walls will you paint in room ${i+1} `);
+        let numWalls : number = getInteger(`How manny walls will you paint in room ${i+1} `);
         let sameColour : boolean = getBool(`Will you paint all walls in room ${i+1} the same colour? [YES,NO] `);
         let colour : string = "";
         let colourindex : number = -1;
@@ -120,10 +120,11 @@ function run(){
             colourindex = colours.findIndex(([k, _]) => k === colour);
         }
         
-        for(let j = 0; j< walls ; j++){
+        for(let j = 0; j< numWalls ; j++){
             let wall : Wall = {}
             wall.width  = getInteger(`what is the width of wall ${j+1} `);
             wall.height = getInteger(`what is the height of wall ${j+1} `);
+            wall.excludeArea = 0;
 
             if(!sameColour){
                 colour = getColour("What colour will you paint this wall? ")
@@ -133,8 +134,23 @@ function run(){
             wall.colour = colour;
             colours[colourindex][1] += area(wall.width,wall.height);
 
-            totalPaint+= calculatePaintForWall(wall.width,wall.height);            
+            totalPaint+= calculatePaintForWall(wall.width,wall.height);
 
+            let toExclude : boolean = getBool("Are the any areas you wish to exclude on this wall? [YES,NO] ");
+
+            if(toExclude){
+                let end : boolean = false;
+                let count : number = 1;
+                while(!end){
+                    let width : number = getInteger(`What is the WIDTH of area ${count} to exclude?`);
+                    let height : number = getInteger(`What is the HEIGHT of area ${count} to exclude?`);
+                    wall.excludeArea += area(width,height);
+                    end = !getBool("Are there any more areas to exclude? [YES,NO] ");
+                    console.log(wall.excludeArea);
+                }
+            }
+            
+            walls.push(wall);
         }
 
     }

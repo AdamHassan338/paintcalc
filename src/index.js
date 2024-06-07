@@ -6,15 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
 const syncPrompt = (0, prompt_sync_1.default)();
 const litersPerMetet2 = 0.1;
-//const colours : string[] = ["white","peach","red","blue"];
 let colours = [
     ["white", 0],
     ["peach", 0],
     ["red", 0],
     ["blue", 0]
 ];
-/* TO DO */
-/*  STORE COLOURS WITH THE AREA THEY NEED TO PAINT */
+let walls = [];
 function isValidColour(colour) {
     for (let i = 0; i < colours.length; i++) {
         if (colours[i][0] === colour)
@@ -79,24 +77,39 @@ function run() {
     let rooms = getInteger('How manny rooms will you paint? ');
     console.log(rooms);
     for (let i = 0; i < rooms; i++) {
-        let walls = getInteger(`How manny walls will you paint in room ${i + 1} `);
+        let numWalls = getInteger(`How manny walls will you paint in room ${i + 1} `);
         let sameColour = getBool(`Will you paint all walls in room ${i + 1} the same colour? [YES,NO] `);
-        let colour;
+        let colour = "";
         let colourindex = -1;
         if (sameColour) {
             colour = getColour(`What colour will you paint this room? `);
             colourindex = colours.findIndex(([k, _]) => k === colour);
         }
-        for (let j = 0; j < walls; j++) {
-            let width = getInteger(`what is the width of wall ${j + 1} `);
-            let height = getInteger(`what is the height of wall ${j + 1} `);
+        for (let j = 0; j < numWalls; j++) {
+            let wall = {};
+            wall.width = getInteger(`what is the width of wall ${j + 1} `);
+            wall.height = getInteger(`what is the height of wall ${j + 1} `);
+            wall.excludeArea = 0;
             if (!sameColour) {
                 colour = getColour("What colour will you paint this wall? ");
                 colourindex = colours.findIndex(([k, _]) => k === colour);
             }
-            colours[colourindex][1] += area(width, height);
-            console.log(colours[colourindex][1]);
-            totalPaint += calculatePaintForWall(width, height);
+            wall.colour = colour;
+            colours[colourindex][1] += area(wall.width, wall.height);
+            totalPaint += calculatePaintForWall(wall.width, wall.height);
+            let toExclude = getBool("Are the any areas you wish to exclude on this wall? [YES,NO] ");
+            if (toExclude) {
+                let end = false;
+                let count = 1;
+                while (!end) {
+                    let width = getInteger(`What is the WIDTH of area ${count} to exclude?`);
+                    let height = getInteger(`What is the HEIGHT of area ${count} to exclude?`);
+                    wall.excludeArea += area(width, height);
+                    end = !getBool("Are there any more areas to exclude? [YES,NO] ");
+                    console.log(wall.excludeArea);
+                }
+            }
+            walls.push(wall);
         }
     }
     console.log(`You will need ${totalPaint} Liters of paint`);
