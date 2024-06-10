@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import prompt from 'prompt-sync';
 
 type Wall = {
@@ -10,7 +11,7 @@ type Wall = {
     excludeArea?: number;
 }
 
-class brand {
+class Brand {
     name: string;
     prices: number[];
     colours: Array<[key: string, value: number]> = [
@@ -30,12 +31,12 @@ class brand {
 
 }
 
-let dulux: brand = new brand("Dulux", [3.00, 3.70, 5.30, 6.00]);
-let goodHome: brand = new brand("GoodHome", [2.80, 3.30, 5.00, 5.70]);
-let sandtex: brand = new brand("Sandtex", [3.20, 3.40, 5.20, 5.10]);
+let dulux: Brand = new Brand("Dulux", [3.00, 3.70, 5.30, 6.00]);
+let goodHome: Brand = new Brand("GoodHome", [2.80, 3.30, 5.00, 5.70]);
+let sandtex: Brand = new Brand("Sandtex", [3.20, 3.40, 5.20, 5.10]);
 
 
-function printPrice(brand: brand) {
+function printPrice(brand: Brand) {
     console.log(brand.name);
 
     console.log(`10L £${brand.prices[0] * 10}`);
@@ -139,14 +140,14 @@ function getColour(promptMessage: string): string {
     return "";
 }
 
-function getBrand(promptMessage: string): brand {
+function getBrand(promptMessage: string): Brand {
     while (true) {
         const input: string = syncPrompt(promptMessage).toLowerCase();
         switch (input) {
             case "dulux":
                 return dulux;
                 break;
-            case "goodHome":
+            case "goodhome":
                 return goodHome;
                 break;
             case "sandtex":
@@ -156,6 +157,63 @@ function getBrand(promptMessage: string): brand {
                 console.log("Sorry, Enter a Brand we sell: Dulux, Goodhome, Sandtex");
         }
     }
+}
+
+function calculateCost(brand : Brand){
+    console.log("You will need to buy: ")
+    let total : number = 0;
+    for(let i : number = 0; i<brand.colours.length; i++){
+        if(brand.colours[i][1]<=0)
+            continue;
+
+        let ten : number = 0;
+        let five : number = 0;
+        let two : number = 0;
+        let one : number = 0;
+        let cost : string = "";
+
+        let remainder = brand.colours[i][1];
+
+        ten = Math.floor(remainder/10);
+        remainder-= 10*ten;
+
+        five = Math.floor(remainder/5);
+        remainder -= 5*five;
+
+        two = Math.floor(remainder/2.5);
+        remainder  -= 2.5*two;
+        
+        one = Math.ceil(remainder);
+        console.log(`${brand.name} ${brand.colours[i][0]} ${brand.colours[i][1]}Liters `)
+
+        
+        if(ten>0){
+            cost = (Math.round(ten * 10 * brand.prices[0] * 100) / 100).toFixed(2);
+            console.log(`- ${ten} x 10L Tins = £${cost}`);
+        }
+        if(five>0){
+            cost = (Math.round(five * 5 * brand.prices[1] * 100) / 100).toFixed(2);
+            console.log(`- ${five} x 5L Tins = £${cost}`);
+            }
+        if(two>0){
+            cost = (Math.round(two * 2.5 * brand.prices[2] * 100) / 100).toFixed(2);
+            console.log(`- ${two} x 2.5L Tins = £${cost}`);
+        }
+        if(one>0){
+            cost = (Math.round(one * 1 * brand.prices[3] * 100) / 100).toFixed(2);
+            console.log(`- ${one} x 1L Tins = £${cost}`);
+        }
+
+        total += ten * 10 * brand.prices[0];
+        total += five * 5 * brand.prices[1];
+        total += two * 2.5 * brand.prices[2];
+        total += one * 1 * brand.prices[3];
+
+        
+
+    }
+
+    console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`)
 }
 
 
@@ -170,7 +228,7 @@ function run() {
     printPrice(goodHome);
     printPrice(sandtex);
 
-    let brand: brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
+    let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms: number = getInteger('How manny rooms will you paint? ');
 
     for (let i = 0; i < rooms; i++) {
@@ -220,7 +278,7 @@ function run() {
 
     }
     console.log(brand.colours);
-    console.log(`You will need ${totalPaint} Liters of paint`);
+    calculateCost(brand);
 
 }
 

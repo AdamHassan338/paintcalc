@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
-class brand {
+class Brand {
     constructor(name, prices) {
         this.colours = [
             ["PEACH", 0],
@@ -19,9 +19,9 @@ class brand {
         this.prices = prices;
     }
 }
-let dulux = new brand("Dulux", [3.00, 3.70, 5.30, 6.00]);
-let goodHome = new brand("GoodHome", [2.80, 3.30, 5.00, 5.70]);
-let sandtex = new brand("Sandtex", [3.20, 3.40, 5.20, 5.10]);
+let dulux = new Brand("Dulux", [3.00, 3.70, 5.30, 6.00]);
+let goodHome = new Brand("GoodHome", [2.80, 3.30, 5.00, 5.70]);
+let sandtex = new Brand("Sandtex", [3.20, 3.40, 5.20, 5.10]);
 function printPrice(brand) {
     console.log(brand.name);
     console.log(`10L £${brand.prices[0] * 10}`);
@@ -105,7 +105,7 @@ function getBrand(promptMessage) {
             case "dulux":
                 return dulux;
                 break;
-            case "goodHome":
+            case "goodhome":
                 return goodHome;
                 break;
             case "sandtex":
@@ -115,6 +115,49 @@ function getBrand(promptMessage) {
                 console.log("Sorry, Enter a Brand we sell: Dulux, Goodhome, Sandtex");
         }
     }
+}
+function calculateCost(brand) {
+    console.log("You will need to buy: ");
+    let total = 0;
+    for (let i = 0; i < brand.colours.length; i++) {
+        if (brand.colours[i][1] <= 0)
+            continue;
+        let ten = 0;
+        let five = 0;
+        let two = 0;
+        let one = 0;
+        let cost = "";
+        let remainder = brand.colours[i][1];
+        ten = Math.floor(remainder / 10);
+        remainder -= 10 * ten;
+        five = Math.floor(remainder / 5);
+        remainder -= 5 * five;
+        two = Math.floor(remainder / 2.5);
+        remainder -= 2.5 * two;
+        one = Math.ceil(remainder);
+        console.log(`${brand.name} ${brand.colours[i][0]} ${brand.colours[i][1]}Liters `);
+        if (ten > 0) {
+            cost = (Math.round(ten * 10 * brand.prices[0] * 100) / 100).toFixed(2);
+            console.log(`- ${ten} x 10L Tins = £${cost}`);
+        }
+        if (five > 0) {
+            cost = (Math.round(five * 5 * brand.prices[1] * 100) / 100).toFixed(2);
+            console.log(`- ${five} x 5L Tins = £${cost}`);
+        }
+        if (two > 0) {
+            cost = (Math.round(two * 2.5 * brand.prices[2] * 100) / 100).toFixed(2);
+            console.log(`- ${two} x 2.5L Tins = £${cost}`);
+        }
+        if (one > 0) {
+            cost = (Math.round(one * 1 * brand.prices[3] * 100) / 100).toFixed(2);
+            console.log(`- ${one} x 1L Tins = £${cost}`);
+        }
+        total += ten * 10 * brand.prices[0];
+        total += five * 5 * brand.prices[1];
+        total += two * 2.5 * brand.prices[2];
+        total += one * 1 * brand.prices[3];
+    }
+    console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`);
 }
 //get number of rooms
 //get number of walls
@@ -155,6 +198,7 @@ function run() {
                     let width = getInteger(`What is the WIDTH of area ${count} to exclude?`);
                     let height = getInteger(`What is the HEIGHT of area ${count} to exclude?`);
                     wall.excludeArea += area(width, height);
+                    brand.colours[colourindex][1] -= area(width, height);
                     end = !getBool("Are there any more areas to exclude? [YES,NO] ");
                     console.log(wall.excludeArea);
                 }
@@ -163,6 +207,6 @@ function run() {
         }
     }
     console.log(brand.colours);
-    console.log(`You will need ${totalPaint} Liters of paint`);
+    calculateCost(brand);
 }
 run();
