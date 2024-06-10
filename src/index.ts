@@ -1,4 +1,3 @@
-import { Console } from 'console';
 import prompt from 'prompt-sync';
 
 type Wall = {
@@ -10,6 +9,8 @@ type Wall = {
     excludeHeight?: number;
     excludeArea?: number;
 }
+
+type Shape = "quad" | "circle"
 
 class Brand {
     name: string;
@@ -78,8 +79,7 @@ function isValidColour(colour: string): boolean {
 let totalPaint = 0;
 
 
-function calculatePaintForWall(width: number, height: number): number {
-    let area: number = width * height;
+function calculatePaintForWall(area: number) : number {
 
     return area * litersPerMetet2;
 
@@ -89,7 +89,7 @@ function area(width: number, height: number): number {
     return width * height;
 }
 
-function getInteger(promptMessage: string): number {
+function getNumber(promptMessage: string): number {
     let isValid = false;
     let number;
 
@@ -159,6 +159,42 @@ function getBrand(promptMessage: string): Brand {
     }
 }
 
+function getShape(promptMessage: string): Shape {
+    while (true) {
+        const input: string = syncPrompt(promptMessage).toLowerCase();
+        switch (input) {
+            case "quad" :
+                return "quad";
+                break;
+            case "circle":
+                return "circle";
+                break;
+            default:
+                console.log("Sorry, supported shapes are quad or circle choose one of these that best fits. ");
+        }
+    }
+}
+
+function getShapeArea(shape : Shape) : number {
+
+    switch(shape){
+        case "quad":
+            let width : number = getNumber("What is the width?" );
+            let height : number = getNumber("What is the height? ");
+            return area(width,height);
+            break;
+        case "circle":
+            let radius : number = getNumber("What is the radius? ");
+            return Math.PI * Math.pow(radius,2);
+            break
+        default:
+            console.log(`IN VALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
+            return -1;
+            break;
+    }
+    return -1;
+}
+
 function calculateCost(brand : Brand){
     console.log("You will need to buy: ")
     let total : number = 0;
@@ -222,6 +258,11 @@ function calculateCost(brand : Brand){
 //get number of walls
 //get size of wall
 //get exclude area
+//ask how manny doors are in this room
+    //how manny windows are in this room
+    //are all windows the same size
+    //are all windows the same shape
+    //ask how manny doors are in 
 function run() {
 
     printPrice(dulux);
@@ -229,13 +270,18 @@ function run() {
     printPrice(sandtex);
 
     let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
-    let rooms: number = getInteger('How manny rooms will you paint? ');
+    let rooms: number = getNumber('How manny rooms will you paint? ');
 
     for (let i = 0; i < rooms; i++) {
-        let numWalls: number = getInteger(`How manny walls will you paint in room ${i + 1} `);
+        let numWalls: number = getNumber(`How manny walls will you paint in room ${i + 1} `);
         let sameColour: boolean = getBool(`Will you paint all walls in room ${i + 1} the same colour? [YES,NO] `);
         let colour: string = "";
         let colourindex: number = -1;
+
+        let areDoors, areWindows : boolean;
+
+        areDoors = getBool(`Are there any doors in room ${i+1}? [YES,NO] `);
+        areWindows = getBool(`Are there any windows in room ${i+1}? [YES,NO] `);
 
         if (sameColour) {
             colour = getColour(`What colour will you paint this room? `);
@@ -244,8 +290,8 @@ function run() {
 
         for (let j = 0; j < numWalls; j++) {
             let wall: Wall = {}
-            wall.width = getInteger(`what is the width of wall ${j + 1} `);
-            wall.height = getInteger(`what is the height of wall ${j + 1} `);
+            wall.width = getNumber(`what is the width of wall ${j + 1} `);
+            wall.height = getNumber(`what is the height of wall ${j + 1} `);
             wall.excludeArea = 0;
 
             if (!sameColour) {
@@ -256,16 +302,51 @@ function run() {
             wall.colour = colour;
             brand.colours[colourindex][1] += area(wall.width, wall.height);
 
-            totalPaint += calculatePaintForWall(wall.width, wall.height);
+            totalPaint += calculatePaintForWall(wall.width * wall.height);
 
-            let toExclude: boolean = getBool("Are the any areas you wish to exclude on this wall? [YES,NO] ");
+            if(areDoors){
+                let isDoor: boolean = getBool(`Are there any doors on wall ${j+1}? [YES,NO] `);
+                if(!isDoor)
+                    break;
+                let numDoors : number = getNumber(`How manny doors are on wall ${j+1}? (count double doors as 2) `);
+                brand.colours[colourindex][1] -= area(2*numDoors, 0.9*numDoors);
+                totalPaint-= calculatePaintForWall(2*numDoors * 0.9*numDoors);
+            }
+
+            if(areWindows){
+                let isWindow: boolean = getBool(`Are there any windows on wall ${j+1}? [YES,NO] `);
+                let sameShape : boolean;
+                let shape : Shape = "quad";
+                if(!isWindow)
+                    break;
+                let numWindows : number = getNumber(`How manny windows on wall ${j+1}?`);
+                if(numWindows==1){
+                    sameShape = true;
+                }
+                else
+                    sameShape = getBool(`Are all windows on this wall the same shape? [YES,NO] `);
+                if(sameShape)
+                    shape = getShape("What is the shape? [QUAD,CIRCLE] ")
+                for(let k : number = 0 ; k<numWindows ; k++){
+                    if(!sameShape)
+                        shape = getShape(`What is the shape of window ${k+1}? [QUAD,CIRCLE] `);
+                    console.log(`Dimentions of window ${k+1}: `);
+                    let windowArea = getShapeArea(shape);
+                    brand.colours[colourindex][1] -= windowArea;
+                    totalPaint-= calculatePaintForWall(windowArea);
+                }
+
+            }
+
+
+            let toExclude: boolean = getBool("Are the any areas you wish to exclude on this wall other than doors and windows? [YES,NO] ");
 
             if (toExclude) {
                 let end: boolean = false;
                 let count: number = 1;
                 while (!end) {
-                    let width: number = getInteger(`What is the WIDTH of area ${count} to exclude?`);
-                    let height: number = getInteger(`What is the HEIGHT of area ${count} to exclude?`);
+                    let width: number = getNumber(`What is the WIDTH of area ${count} to exclude?`);
+                    let height: number = getNumber(`What is the HEIGHT of area ${count} to exclude?`);
                     wall.excludeArea += area(width, height);
                     brand.colours[colourindex][1] -= area(width, height);
                     end = !getBool("Are there any more areas to exclude? [YES,NO] ");
