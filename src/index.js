@@ -48,6 +48,18 @@ let colours = [
     ["OLIVE", 0],
     ["SAGE", 0]
 ];
+function printColours() {
+    let output = "";
+    for (let i = 0; i < colours.length; i++) {
+        if (i == 0 || i == colours.length) {
+        }
+        else {
+            output += ",";
+        }
+        output += colours[i][0];
+    }
+    console.log(output);
+}
 let walls = [];
 function isValidColour(colour) {
     for (let i = 0; i < colours.length; i++) {
@@ -97,8 +109,11 @@ function getColour(promptMessage) {
     /* print the colour options */
     promptMessage += "Options: ";
     for (let i = 0; i < colours.length; i++) {
-        if (i != 0 || i != colours.length - 1)
+        if (i == 0 || i == colours.length) {
+        }
+        else {
             promptMessage += ",";
+        }
         promptMessage += " " + colours[i][0];
     }
     promptMessage += " ";
@@ -217,9 +232,13 @@ exports.calculateCost = calculateCost;
 //are all windows the same shape
 //ask how manny doors are in 
 function run() {
+    console.log("Prices:");
     printPrice(dulux);
     printPrice(goodHome);
     printPrice(sandtex);
+    console.log("The colour optios are: ");
+    printColours();
+    console.log();
     console.log("Give all mesurments in Meters");
     let brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms = getNumber('How manny rooms will you paint? ');

@@ -74,6 +74,20 @@ let colours: Array<[key: string, value: number]> = [
     ["SAGE", 0]
 ];
 
+function printColours(){
+    let output : string = "";
+    for(let i = 0; i< colours.length ; i++){
+        if (i == 0 || i == colours.length){
+
+        }else{
+            output += ","
+        }
+            
+        output+= colours[i][0];
+    }
+    console.log(output);
+}
+
 let walls: Array<Wall> = [];
 
 
@@ -141,8 +155,11 @@ function getColour(promptMessage: string): string {
     /* print the colour options */
     promptMessage += "Options: ";
     for (let i: number = 0; i < colours.length; i++) {
-        if (i != 0 || i != colours.length - 1)
+        if (i == 0 || i == colours.length){
+
+        }else{
             promptMessage += ","
+        }
         promptMessage += " " + colours[i][0];
     }
     promptMessage += " ";
@@ -280,9 +297,14 @@ export function calculateCost(brand: Brand): number {
 //ask how manny doors are in 
 function run() {
 
+    console.log("Prices:")
     printPrice(dulux);
     printPrice(goodHome);
     printPrice(sandtex);
+
+    console.log("The colour optios are: ");
+    printColours();
+    console.log();
 
     console.log("Give all mesurments in Meters");
 
