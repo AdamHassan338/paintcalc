@@ -66,7 +66,7 @@ function getNumber(promptMessage) {
     let isValid = false;
     let number;
     while (true) {
-        const input = syncPrompt(promptMessage);
+        const input = syncPrompt(promptMessage).trim();
         number = parseInt(input, 10);
         if (!isNaN(number)) {
             if (number > 0)
@@ -83,7 +83,7 @@ function getNumber(promptMessage) {
 function getBool(promptMessage) {
     let isValid = false;
     while (true) {
-        const input = syncPrompt(promptMessage).toUpperCase();
+        const input = syncPrompt(promptMessage).toUpperCase().trim();
         if (input === "YES")
             return true;
         if (input === "NO")
@@ -95,8 +95,15 @@ function getBool(promptMessage) {
 function getColour(promptMessage) {
     /* TO DO */
     /* print the colour options */
+    promptMessage += "Options: ";
+    for (let i = 0; i < colours.length; i++) {
+        if (i != 0 || i != colours.length - 1)
+            promptMessage += ",";
+        promptMessage += " " + colours[i][0];
+    }
+    promptMessage += " ";
     while (true) {
-        const input = syncPrompt(promptMessage).toUpperCase();
+        const input = syncPrompt(promptMessage).toUpperCase().trim();
         if (isValidColour(input))
             return input;
         console.log("please enter a valid colour");
@@ -105,7 +112,7 @@ function getColour(promptMessage) {
 }
 function getBrand(promptMessage) {
     while (true) {
-        const input = syncPrompt(promptMessage).toLowerCase();
+        const input = syncPrompt(promptMessage).toLowerCase().trim();
         switch (input) {
             case "dulux":
                 return dulux;
@@ -123,7 +130,7 @@ function getBrand(promptMessage) {
 }
 function getShape(promptMessage) {
     while (true) {
-        const input = syncPrompt(promptMessage).toLowerCase();
+        const input = syncPrompt(promptMessage).toLowerCase().trim();
         switch (input) {
             case "quad":
                 return "quad";
@@ -148,7 +155,7 @@ function getShapeArea(shape) {
             return area(radius);
             break;
         default:
-            console.log(`IN VALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
+            console.log(`INVALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
             return -1;
             break;
     }
@@ -242,33 +249,33 @@ function run() {
             totalPaint += calculatePaintForWall(wall.width * wall.height);
             if (areDoors) {
                 let isDoor = getBool(`Are there any doors on wall ${j + 1}? [YES,NO] `);
-                if (!isDoor)
-                    break;
-                let numDoors = getNumber(`How manny doors are on wall ${j + 1}? (count double doors as 2) `);
-                brand.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
-                totalPaint -= calculatePaintForWall(2 * numDoors * 0.9 * numDoors);
+                if (isDoor) {
+                    let numDoors = getNumber(`How manny doors are on wall ${j + 1}? (count double doors as 2) `);
+                    brand.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
+                    totalPaint -= calculatePaintForWall(2 * numDoors * 0.9 * numDoors);
+                }
             }
             if (areWindows) {
                 let isWindow = getBool(`Are there any windows on wall ${j + 1}? [YES,NO] `);
                 let sameShape;
                 let shape = "quad";
-                if (!isWindow)
-                    break;
-                let numWindows = getNumber(`How manny windows on wall ${j + 1}?`);
-                if (numWindows == 1) {
-                    sameShape = true;
-                }
-                else
-                    sameShape = getBool(`Are all windows on this wall the same shape? [YES,NO] `);
-                if (sameShape)
-                    shape = getShape("What is the shape? [QUAD,CIRCLE] ");
-                for (let k = 0; k < numWindows; k++) {
-                    if (!sameShape)
-                        shape = getShape(`What is the shape of window ${k + 1}? [QUAD,CIRCLE] `);
-                    console.log(`Dimentions of window ${k + 1}: `);
-                    let windowArea = getShapeArea(shape);
-                    brand.colours[colourindex][1] -= windowArea;
-                    totalPaint -= calculatePaintForWall(windowArea);
+                if (isWindow) {
+                    let numWindows = getNumber(`How manny windows on wall ${j + 1}?`);
+                    if (numWindows == 1) {
+                        sameShape = true;
+                    }
+                    else
+                        sameShape = getBool(`Are all windows on this wall the same shape? [YES,NO] `);
+                    if (sameShape)
+                        shape = getShape("What is the shape? [QUAD,CIRCLE] ");
+                    for (let k = 0; k < numWindows; k++) {
+                        if (!sameShape)
+                            shape = getShape(`What is the shape of window ${k + 1}? [QUAD,CIRCLE] `);
+                        console.log(`Dimentions of window ${k + 1}: `);
+                        let windowArea = getShapeArea(shape);
+                        brand.colours[colourindex][1] -= windowArea;
+                        totalPaint -= calculatePaintForWall(windowArea);
+                    }
                 }
             }
             let toExclude = getBool("Are the any areas you wish to exclude on this wall other than doors and windows? [YES,NO] ");
@@ -290,4 +297,4 @@ function run() {
     console.log(brand.colours);
     calculateCost(brand);
 }
-//run();
+run();

@@ -1,14 +1,14 @@
 import prompt from 'prompt-sync';
 
 
-export function area(width: number, height: number) : number;
+export function area(width: number, height: number): number;
 
 export function area(radius: number): number;
 
 export function area(arg1: number, arg2?: number): number {
-    if(arg2 !== undefined)
+    if (arg2 !== undefined)
         return arg1 * arg2;
-    return Math.PI * Math.pow(arg1,2); 
+    return Math.PI * Math.pow(arg1, 2);
 }
 
 type Wall = {
@@ -78,7 +78,7 @@ let walls: Array<Wall> = [];
 
 
 export function isValidColour(colour: string): boolean {
-    
+
     for (let i = 0; i < colours.length; i++) {
         if (colours[i][0] === colour)
             return true;
@@ -89,7 +89,7 @@ export function isValidColour(colour: string): boolean {
 let totalPaint = 0;
 
 
-export function calculatePaintForWall(area: number) : number {
+export function calculatePaintForWall(area: number): number {
 
     return area * litersPerMetet2;
 
@@ -103,7 +103,7 @@ function getNumber(promptMessage: string): number {
 
     while (true) {
 
-        const input: string = syncPrompt(promptMessage);
+        const input: string = syncPrompt(promptMessage).trim();
         number = parseInt(input, 10);
 
         if (!isNaN(number)) {
@@ -124,7 +124,7 @@ function getBool(promptMessage: string): boolean {
     let isValid = false;
 
     while (true) {
-        const input: string = syncPrompt(promptMessage).toUpperCase();
+        const input: string = syncPrompt(promptMessage).toUpperCase().trim();
         if (input === "YES")
             return true;
         if (input === "NO")
@@ -139,8 +139,15 @@ function getColour(promptMessage: string): string {
 
     /* TO DO */
     /* print the colour options */
+    promptMessage += "Options: ";
+    for (let i: number = 0; i < colours.length; i++) {
+        if (i != 0 || i != colours.length - 1)
+            promptMessage += ","
+        promptMessage += " " + colours[i][0];
+    }
+    promptMessage += " ";
     while (true) {
-        const input: string = syncPrompt(promptMessage).toUpperCase();
+        const input: string = syncPrompt(promptMessage).toUpperCase().trim();
         if (isValidColour(input))
             return input;
         console.log("please enter a valid colour");
@@ -150,7 +157,7 @@ function getColour(promptMessage: string): string {
 
 function getBrand(promptMessage: string): Brand {
     while (true) {
-        const input: string = syncPrompt(promptMessage).toLowerCase();
+        const input: string = syncPrompt(promptMessage).toLowerCase().trim();
         switch (input) {
             case "dulux":
                 return dulux;
@@ -169,9 +176,9 @@ function getBrand(promptMessage: string): Brand {
 
 function getShape(promptMessage: string): Shape {
     while (true) {
-        const input: string = syncPrompt(promptMessage).toLowerCase();
+        const input: string = syncPrompt(promptMessage).toLowerCase().trim();
         switch (input) {
-            case "quad" :
+            case "quad":
                 return "quad";
                 break;
             case "circle":
@@ -183,67 +190,67 @@ function getShape(promptMessage: string): Shape {
     }
 }
 
-export function getShapeArea(shape : Shape) : number {
+export function getShapeArea(shape: Shape): number {
 
-    switch(shape){
+    switch (shape) {
         case "quad":
-            let width : number = getNumber("What is the width?" );
-            let height : number = getNumber("What is the height? ");
-            return area(width,height);
+            let width: number = getNumber("What is the width?");
+            let height: number = getNumber("What is the height? ");
+            return area(width, height);
             break;
         case "circle":
-            let radius : number = getNumber("What is the radius? ");
+            let radius: number = getNumber("What is the radius? ");
             return area(radius);
             break
         default:
-            console.log(`IN VALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
+            console.log(`INVALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
             return -1;
             break;
     }
     return -1;
 }
 
-export function calculateCost(brand : Brand) : number {
+export function calculateCost(brand: Brand): number {
     console.log("You will need to buy: ")
-    let total : number = 0;
-    for(let i : number = 0; i<brand.colours.length; i++){
-        if(brand.colours[i][1]<=0)
+    let total: number = 0;
+    for (let i: number = 0; i < brand.colours.length; i++) {
+        if (brand.colours[i][1] <= 0)
             continue;
 
-        let ten : number = 0;
-        let five : number = 0;
-        let two : number = 0;
-        let one : number = 0;
-        let cost : string = "";
+        let ten: number = 0;
+        let five: number = 0;
+        let two: number = 0;
+        let one: number = 0;
+        let cost: string = "";
 
         let remainder = brand.colours[i][1];
 
-        ten = Math.floor(remainder/10);
-        remainder-= 10*ten;
+        ten = Math.floor(remainder / 10);
+        remainder -= 10 * ten;
 
-        five = Math.floor(remainder/5);
-        remainder -= 5*five;
+        five = Math.floor(remainder / 5);
+        remainder -= 5 * five;
 
-        two = Math.floor(remainder/2.5);
-        remainder  -= 2.5*two;
-        
+        two = Math.floor(remainder / 2.5);
+        remainder -= 2.5 * two;
+
         one = Math.ceil(remainder);
         console.log(`${brand.name} ${brand.colours[i][0]} ${brand.colours[i][1]}Liters `)
 
-        
-        if(ten>0){
+
+        if (ten > 0) {
             cost = (Math.round(ten * 10 * brand.prices[0] * 100) / 100).toFixed(2);
             console.log(`- ${ten} x 10L Tins = £${cost}`);
         }
-        if(five>0){
+        if (five > 0) {
             cost = (Math.round(five * 5 * brand.prices[1] * 100) / 100).toFixed(2);
             console.log(`- ${five} x 5L Tins = £${cost}`);
-            }
-        if(two>0){
+        }
+        if (two > 0) {
             cost = (Math.round(two * 2.5 * brand.prices[2] * 100) / 100).toFixed(2);
             console.log(`- ${two} x 2.5L Tins = £${cost}`);
         }
-        if(one>0){
+        if (one > 0) {
             cost = (Math.round(one * 1 * brand.prices[3] * 100) / 100).toFixed(2);
             console.log(`- ${one} x 1L Tins = £${cost}`);
         }
@@ -253,7 +260,7 @@ export function calculateCost(brand : Brand) : number {
         total += two * 2.5 * brand.prices[2];
         total += one * 1 * brand.prices[3];
 
-    
+
     }
 
     console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`)
@@ -267,10 +274,10 @@ export function calculateCost(brand : Brand) : number {
 //get size of wall
 //get exclude area
 //ask how manny doors are in this room
-    //how manny windows are in this room
-    //are all windows the same size
-    //are all windows the same shape
-    //ask how manny doors are in 
+//how manny windows are in this room
+//are all windows the same size
+//are all windows the same shape
+//ask how manny doors are in 
 function run() {
 
     printPrice(dulux);
@@ -288,10 +295,10 @@ function run() {
         let colour: string = "";
         let colourindex: number = -1;
 
-        let areDoors, areWindows : boolean;
+        let areDoors, areWindows: boolean;
 
-        areDoors = getBool(`Are there any doors in room ${i+1}? [YES,NO] `);
-        areWindows = getBool(`Are there any windows in room ${i+1}? [YES,NO] `);
+        areDoors = getBool(`Are there any doors in room ${i + 1}? [YES,NO] `);
+        areWindows = getBool(`Are there any windows in room ${i + 1}? [YES,NO] `);
 
         if (sameColour) {
             colour = getColour(`What colour will you paint this room? `);
@@ -314,38 +321,37 @@ function run() {
 
             totalPaint += calculatePaintForWall(wall.width * wall.height);
 
-            if(areDoors){
-                let isDoor: boolean = getBool(`Are there any doors on wall ${j+1}? [YES,NO] `);
-                if(!isDoor)
-                    break;
-                let numDoors : number = getNumber(`How manny doors are on wall ${j+1}? (count double doors as 2) `);
-                brand.colours[colourindex][1] -= area(2*numDoors, 0.9*numDoors);
-                totalPaint-= calculatePaintForWall(2*numDoors * 0.9*numDoors);
+            if (areDoors) {
+                let isDoor: boolean = getBool(`Are there any doors on wall ${j + 1}? [YES,NO] `);
+                if (isDoor) {
+                    let numDoors: number = getNumber(`How manny doors are on wall ${j + 1}? (count double doors as 2) `);
+                    brand.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
+                    totalPaint -= calculatePaintForWall(2 * numDoors * 0.9 * numDoors);
+                }
             }
 
-            if(areWindows){
-                let isWindow: boolean = getBool(`Are there any windows on wall ${j+1}? [YES,NO] `);
-                let sameShape : boolean;
-                let shape : Shape = "quad";
-                if(!isWindow)
-                    break;
-                let numWindows : number = getNumber(`How manny windows on wall ${j+1}?`);
-                if(numWindows==1){
-                    sameShape = true;
+            if (areWindows) {
+                let isWindow: boolean = getBool(`Are there any windows on wall ${j + 1}? [YES,NO] `);
+                let sameShape: boolean;
+                let shape: Shape = "quad";
+                if (isWindow) {
+                    let numWindows: number = getNumber(`How manny windows on wall ${j + 1}?`);
+                    if (numWindows == 1) {
+                        sameShape = true;
+                    }
+                    else
+                        sameShape = getBool(`Are all windows on this wall the same shape? [YES,NO] `);
+                    if (sameShape)
+                        shape = getShape("What is the shape? [QUAD,CIRCLE] ")
+                    for (let k: number = 0; k < numWindows; k++) {
+                        if (!sameShape)
+                            shape = getShape(`What is the shape of window ${k + 1}? [QUAD,CIRCLE] `);
+                        console.log(`Dimentions of window ${k + 1}: `);
+                        let windowArea = getShapeArea(shape);
+                        brand.colours[colourindex][1] -= windowArea;
+                        totalPaint -= calculatePaintForWall(windowArea);
+                    }
                 }
-                else
-                    sameShape = getBool(`Are all windows on this wall the same shape? [YES,NO] `);
-                if(sameShape)
-                    shape = getShape("What is the shape? [QUAD,CIRCLE] ")
-                for(let k : number = 0 ; k<numWindows ; k++){
-                    if(!sameShape)
-                        shape = getShape(`What is the shape of window ${k+1}? [QUAD,CIRCLE] `);
-                    console.log(`Dimentions of window ${k+1}: `);
-                    let windowArea = getShapeArea(shape);
-                    brand.colours[colourindex][1] -= windowArea;
-                    totalPaint-= calculatePaintForWall(windowArea);
-                }
-
             }
 
 
@@ -373,4 +379,4 @@ function run() {
 
 }
 
-//run();
+run();
