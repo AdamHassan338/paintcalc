@@ -1,5 +1,16 @@
 import prompt from 'prompt-sync';
 
+
+export function area(width: number, height: number) : number;
+
+export function area(radius: number): number;
+
+export function area(arg1: number, arg2?: number): number {
+    if(arg2 !== undefined)
+        return arg1 * arg2;
+    return Math.PI * Math.pow(arg1,2); 
+}
+
 type Wall = {
     width?: number;
     height?: number;
@@ -12,7 +23,7 @@ type Wall = {
 
 type Shape = "quad" | "circle"
 
-class Brand {
+export class Brand {
     name: string;
     prices: number[];
     colours: Array<[key: string, value: number]> = [
@@ -66,28 +77,25 @@ let colours: Array<[key: string, value: number]> = [
 let walls: Array<Wall> = [];
 
 
-function isValidColour(colour: string): boolean {
-
+export function isValidColour(colour: string): boolean {
+    
     for (let i = 0; i < colours.length; i++) {
         if (colours[i][0] === colour)
             return true;
     }
-    console.log(colour);
     return false;
 }
 
 let totalPaint = 0;
 
 
-function calculatePaintForWall(area: number) : number {
+export function calculatePaintForWall(area: number) : number {
 
     return area * litersPerMetet2;
 
 }
 
-function area(width: number, height: number): number {
-    return width * height;
-}
+
 
 function getNumber(promptMessage: string): number {
     let isValid = false;
@@ -175,7 +183,7 @@ function getShape(promptMessage: string): Shape {
     }
 }
 
-function getShapeArea(shape : Shape) : number {
+export function getShapeArea(shape : Shape) : number {
 
     switch(shape){
         case "quad":
@@ -185,7 +193,7 @@ function getShapeArea(shape : Shape) : number {
             break;
         case "circle":
             let radius : number = getNumber("What is the radius? ");
-            return Math.PI * Math.pow(radius,2);
+            return area(radius);
             break
         default:
             console.log(`IN VALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
@@ -195,7 +203,7 @@ function getShapeArea(shape : Shape) : number {
     return -1;
 }
 
-function calculateCost(brand : Brand){
+export function calculateCost(brand : Brand) : number {
     console.log("You will need to buy: ")
     let total : number = 0;
     for(let i : number = 0; i<brand.colours.length; i++){
@@ -245,11 +253,11 @@ function calculateCost(brand : Brand){
         total += two * 2.5 * brand.prices[2];
         total += one * 1 * brand.prices[3];
 
-        
-
+    
     }
 
     console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`)
+    return total;
 }
 
 
@@ -268,6 +276,8 @@ function run() {
     printPrice(dulux);
     printPrice(goodHome);
     printPrice(sandtex);
+
+    console.log("Give all mesurments in Meters");
 
     let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms: number = getNumber('How manny rooms will you paint? ');
@@ -363,4 +373,4 @@ function run() {
 
 }
 
-run();
+//run();

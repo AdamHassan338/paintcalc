@@ -3,7 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.calculateCost = exports.getShapeArea = exports.calculatePaintForWall = exports.isValidColour = exports.Brand = exports.area = void 0;
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
+function area(arg1, arg2) {
+    if (arg2 !== undefined)
+        return arg1 * arg2;
+    return Math.PI * Math.pow(arg1, 2);
+}
+exports.area = area;
 class Brand {
     constructor(name, prices) {
         this.colours = [
@@ -19,6 +26,7 @@ class Brand {
         this.prices = prices;
     }
 }
+exports.Brand = Brand;
 let dulux = new Brand("Dulux", [3.00, 3.70, 5.30, 6.00]);
 let goodHome = new Brand("GoodHome", [2.80, 3.30, 5.00, 5.70]);
 let sandtex = new Brand("Sandtex", [3.20, 3.40, 5.20, 5.10]);
@@ -46,16 +54,14 @@ function isValidColour(colour) {
         if (colours[i][0] === colour)
             return true;
     }
-    console.log(colour);
     return false;
 }
+exports.isValidColour = isValidColour;
 let totalPaint = 0;
 function calculatePaintForWall(area) {
     return area * litersPerMetet2;
 }
-function area(width, height) {
-    return width * height;
-}
+exports.calculatePaintForWall = calculatePaintForWall;
 function getNumber(promptMessage) {
     let isValid = false;
     let number;
@@ -139,7 +145,7 @@ function getShapeArea(shape) {
             break;
         case "circle":
             let radius = getNumber("What is the radius? ");
-            return Math.PI * Math.pow(radius, 2);
+            return area(radius);
             break;
         default:
             console.log(`IN VALID SHAPE IN "getShapeArea(shape : Shape) : number" function call`);
@@ -148,6 +154,7 @@ function getShapeArea(shape) {
     }
     return -1;
 }
+exports.getShapeArea = getShapeArea;
 function calculateCost(brand) {
     console.log("You will need to buy: ");
     let total = 0;
@@ -190,7 +197,9 @@ function calculateCost(brand) {
         total += one * 1 * brand.prices[3];
     }
     console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`);
+    return total;
 }
+exports.calculateCost = calculateCost;
 //get number of rooms
 //get number of walls
 //get size of wall
@@ -204,6 +213,7 @@ function run() {
     printPrice(dulux);
     printPrice(goodHome);
     printPrice(sandtex);
+    console.log("Give all mesurments in Meters");
     let brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms = getNumber('How manny rooms will you paint? ');
     for (let i = 0; i < rooms; i++) {
@@ -280,4 +290,4 @@ function run() {
     console.log(brand.colours);
     calculateCost(brand);
 }
-run();
+//run();
