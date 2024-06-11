@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateCost = exports.getShapeArea = exports.calculatePaintForWall = exports.isValidColour = exports.Brand = exports.area = void 0;
+exports.calculateCost = exports.getShapeArea = exports.calculatePaintForWall = exports.isValidColour = exports.colours = exports.Brand = exports.area = void 0;
 const prompt_sync_1 = __importDefault(require("prompt-sync"));
 function area(arg1, arg2) {
     if (arg2 !== undefined)
@@ -12,16 +12,16 @@ function area(arg1, arg2) {
 }
 exports.area = area;
 class Brand {
+    /* colours: Array<[key: string, value: number]> = [
+         ["PEACH", 0],
+         ["CREAM", 0],
+         ["CLAY", 0],
+         ["WHITE", 0],
+         ["INDIGO", 0],
+         ["OLIVE", 0],
+         ["SAGE", 0]
+     ];*/
     constructor(name, prices) {
-        this.colours = [
-            ["PEACH", 0],
-            ["CREAM", 0],
-            ["CLAY", 0],
-            ["WHITE", 0],
-            ["INDIGO", 0],
-            ["OLIVE", 0],
-            ["SAGE", 0]
-        ];
         this.name = name;
         this.prices = prices;
     }
@@ -39,7 +39,7 @@ function printPrice(brand) {
 }
 const syncPrompt = (0, prompt_sync_1.default)();
 const litersPerMetet2 = 0.1;
-let colours = [
+exports.colours = [
     ["PEACH", 0],
     ["CREAM", 0],
     ["CLAY", 0],
@@ -50,20 +50,20 @@ let colours = [
 ];
 function printColours() {
     let output = "";
-    for (let i = 0; i < colours.length; i++) {
-        if (i == 0 || i == colours.length) {
+    for (let i = 0; i < exports.colours.length; i++) {
+        if (i == 0 || i == exports.colours.length) {
         }
         else {
             output += ",";
         }
-        output += colours[i][0];
+        output += exports.colours[i][0];
     }
     console.log(output);
 }
 let walls = [];
 function isValidColour(colour) {
-    for (let i = 0; i < colours.length; i++) {
-        if (colours[i][0] === colour)
+    for (let i = 0; i < exports.colours.length; i++) {
+        if (exports.colours[i][0] === colour)
             return true;
     }
     return false;
@@ -108,13 +108,13 @@ function getColour(promptMessage) {
     /* TO DO */
     /* print the colour options */
     promptMessage += "Options: ";
-    for (let i = 0; i < colours.length; i++) {
-        if (i == 0 || i == colours.length) {
+    for (let i = 0; i < exports.colours.length; i++) {
+        if (i == 0 || i == exports.colours.length) {
         }
         else {
             promptMessage += ",";
         }
-        promptMessage += " " + colours[i][0];
+        promptMessage += " " + exports.colours[i][0];
     }
     promptMessage += " ";
     while (true) {
@@ -180,15 +180,16 @@ exports.getShapeArea = getShapeArea;
 function calculateCost(brand) {
     console.log("You will need to buy: ");
     let total = 0;
-    for (let i = 0; i < brand.colours.length; i++) {
-        if (brand.colours[i][1] <= 0)
+    for (let i = 0; i < exports.colours.length; i++) {
+        if (exports.colours[i][1] <= 0)
             continue;
+        let subtotal = 0;
         let ten = 0;
         let five = 0;
         let two = 0;
         let one = 0;
         let cost = "";
-        let remainder = brand.colours[i][1];
+        let remainder = exports.colours[i][1];
         ten = Math.floor(remainder / 10);
         remainder -= 10 * ten;
         five = Math.floor(remainder / 5);
@@ -196,7 +197,7 @@ function calculateCost(brand) {
         two = Math.floor(remainder / 2.5);
         remainder -= 2.5 * two;
         one = Math.ceil(remainder);
-        console.log(`${brand.name} ${brand.colours[i][0]} ${Math.round((brand.colours[i][1] * 100) / 100).toFixed(2)} Liters `);
+        console.log(`${brand.name} ${exports.colours[i][0]} ${Math.round((exports.colours[i][1] * 100) / 100).toFixed(2)} Liters `);
         if (ten > 0) {
             cost = (Math.round(ten * 10 * brand.prices[0] * 100) / 100).toFixed(2);
             console.log(`- ${ten} x 10L Tins = £${cost}`);
@@ -213,10 +214,12 @@ function calculateCost(brand) {
             cost = (Math.round(one * 1 * brand.prices[3] * 100) / 100).toFixed(2);
             console.log(`- ${one} x 1L Tins = £${cost}`);
         }
-        total += ten * 10 * brand.prices[0];
-        total += five * 5 * brand.prices[1];
-        total += two * 2.5 * brand.prices[2];
-        total += one * 1 * brand.prices[3];
+        subtotal += ten * 10 * brand.prices[0];
+        subtotal += five * 5 * brand.prices[1];
+        subtotal += two * 2.5 * brand.prices[2];
+        subtotal += one * 1 * brand.prices[3];
+        console.log(`Subtotal: £${(Math.round(subtotal * 100) / 100).toFixed(2)} `);
+        total += subtotal;
     }
     console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`);
     return total;
@@ -240,7 +243,7 @@ function run() {
     printColours();
     console.log();
     console.log("Give all mesurments in Meters");
-    let brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
+    //let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms = getNumber('How manny rooms will you paint? ');
     for (let i = 0; i < rooms; i++) {
         let numWalls = getNumber(`How manny walls will you paint in room ${i + 1} `);
@@ -252,7 +255,7 @@ function run() {
         areWindows = getBool(`Are there any windows in room ${i + 1}? [YES,NO] `);
         if (sameColour) {
             colour = getColour(`What colour will you paint this room? `);
-            colourindex = brand.colours.findIndex(([k, _]) => k === colour);
+            colourindex = exports.colours.findIndex(([k, _]) => k === colour);
         }
         for (let j = 0; j < numWalls; j++) {
             let wall = {};
@@ -261,16 +264,16 @@ function run() {
             wall.excludeArea = 0;
             if (!sameColour) {
                 colour = getColour("What colour will you paint this wall? ");
-                colourindex = brand.colours.findIndex(([k, _]) => k === colour);
+                colourindex = exports.colours.findIndex(([k, _]) => k === colour);
             }
             wall.colour = colour;
-            brand.colours[colourindex][1] += area(wall.width, wall.height);
+            exports.colours[colourindex][1] += area(wall.width, wall.height);
             totalPaint += calculatePaintForWall(wall.width * wall.height);
             if (areDoors) {
                 let isDoor = getBool(`Are there any doors on wall ${j + 1}? [YES,NO] `);
                 if (isDoor) {
                     let numDoors = getNumber(`How manny doors are on wall ${j + 1}? (count double doors as 2) `);
-                    brand.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
+                    exports.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
                     totalPaint -= calculatePaintForWall(2 * numDoors * 0.9 * numDoors);
                 }
             }
@@ -292,7 +295,7 @@ function run() {
                             shape = getShape(`What is the shape of window ${k + 1}? [QUAD,CIRCLE] `);
                         console.log(`Dimentions of window ${k + 1}: `);
                         let windowArea = getShapeArea(shape);
-                        brand.colours[colourindex][1] -= windowArea;
+                        exports.colours[colourindex][1] -= windowArea;
                         totalPaint -= calculatePaintForWall(windowArea);
                     }
                 }
@@ -305,7 +308,7 @@ function run() {
                     let width = getNumber(`What is the WIDTH of area ${count} to exclude?`);
                     let height = getNumber(`What is the HEIGHT of area ${count} to exclude?`);
                     wall.excludeArea += area(width, height);
-                    brand.colours[colourindex][1] -= area(width, height);
+                    exports.colours[colourindex][1] -= area(width, height);
                     end = !getBool("Are there any more areas to exclude? [YES,NO] ");
                     console.log(wall.excludeArea);
                 }
@@ -314,6 +317,14 @@ function run() {
         }
     }
     console.log("");
-    calculateCost(brand);
+    console.log("Options:");
+    console.log("---------------DULUX---------------");
+    calculateCost(dulux);
+    console.log("");
+    console.log("--------------GOODHOME-------------");
+    calculateCost(goodHome);
+    console.log("");
+    console.log("--------------SANDTEX--------------");
+    calculateCost(sandtex);
 }
 run();

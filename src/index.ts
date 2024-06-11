@@ -26,7 +26,7 @@ type Shape = "quad" | "circle"
 export class Brand {
     name: string;
     prices: number[];
-    colours: Array<[key: string, value: number]> = [
+   /* colours: Array<[key: string, value: number]> = [
         ["PEACH", 0],
         ["CREAM", 0],
         ["CLAY", 0],
@@ -34,7 +34,7 @@ export class Brand {
         ["INDIGO", 0],
         ["OLIVE", 0],
         ["SAGE", 0]
-    ];
+    ];*/
 
     constructor(name: string, prices: number[]) {
         this.name = name;
@@ -64,7 +64,7 @@ const syncPrompt = prompt();
 const litersPerMetet2 = 0.1;
 
 
-let colours: Array<[key: string, value: number]> = [
+export let colours: Array<[key: string, value: number]> = [
     ["PEACH", 0],
     ["CREAM", 0],
     ["CLAY", 0],
@@ -230,17 +230,17 @@ export function getShapeArea(shape: Shape): number {
 export function calculateCost(brand: Brand): number {
     console.log("You will need to buy: ")
     let total: number = 0;
-    for (let i: number = 0; i < brand.colours.length; i++) {
-        if (brand.colours[i][1] <= 0)
+    for (let i: number = 0; i < colours.length; i++) {
+        if (colours[i][1] <= 0)
             continue;
-
+        let subtotal : number = 0;
         let ten: number = 0;
         let five: number = 0;
         let two: number = 0;
         let one: number = 0;
         let cost: string = "";
 
-        let remainder = brand.colours[i][1];
+        let remainder = colours[i][1];
 
         ten = Math.floor(remainder / 10);
         remainder -= 10 * ten;
@@ -252,7 +252,7 @@ export function calculateCost(brand: Brand): number {
         remainder -= 2.5 * two;
 
         one = Math.ceil(remainder);
-        console.log(`${brand.name} ${brand.colours[i][0]} ${Math.round((brand.colours[i][1] * 100) / 100).toFixed(2)} Liters `)
+        console.log(`${brand.name} ${colours[i][0]} ${Math.round((colours[i][1] * 100) / 100).toFixed(2)} Liters `)
 
 
         if (ten > 0) {
@@ -272,11 +272,14 @@ export function calculateCost(brand: Brand): number {
             console.log(`- ${one} x 1L Tins = £${cost}`);
         }
 
-        total += ten * 10 * brand.prices[0];
-        total += five * 5 * brand.prices[1];
-        total += two * 2.5 * brand.prices[2];
-        total += one * 1 * brand.prices[3];
+        subtotal += ten * 10 * brand.prices[0];
+        subtotal += five * 5 * brand.prices[1];
+        subtotal += two * 2.5 * brand.prices[2];
+        subtotal += one * 1 * brand.prices[3];
         
+        console.log(`Subtotal: £${(Math.round(subtotal * 100) / 100).toFixed(2)} `);
+
+        total+= subtotal;
     
     }
 
@@ -308,7 +311,7 @@ function run() {
 
     console.log("Give all mesurments in Meters");
 
-    let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
+    //let brand: Brand = getBrand(`What brand of paint do you want to buy: Dulux, GoodHome, Sandtex? `);
     let rooms: number = getNumber('How manny rooms will you paint? ');
 
     for (let i = 0; i < rooms; i++) {
@@ -324,7 +327,7 @@ function run() {
 
         if (sameColour) {
             colour = getColour(`What colour will you paint this room? `);
-            colourindex = brand.colours.findIndex(([k, _]) => k === colour);
+            colourindex = colours.findIndex(([k, _]) => k === colour);
         }
 
         for (let j = 0; j < numWalls; j++) {
@@ -335,11 +338,11 @@ function run() {
 
             if (!sameColour) {
                 colour = getColour("What colour will you paint this wall? ")
-                colourindex = brand.colours.findIndex(([k, _]) => k === colour);
+                colourindex = colours.findIndex(([k, _]) => k === colour);
 
             }
             wall.colour = colour;
-            brand.colours[colourindex][1] += area(wall.width, wall.height);
+            colours[colourindex][1] += area(wall.width, wall.height);
 
             totalPaint += calculatePaintForWall(wall.width * wall.height);
 
@@ -347,7 +350,7 @@ function run() {
                 let isDoor: boolean = getBool(`Are there any doors on wall ${j + 1}? [YES,NO] `);
                 if (isDoor) {
                     let numDoors: number = getNumber(`How manny doors are on wall ${j + 1}? (count double doors as 2) `);
-                    brand.colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
+                    colours[colourindex][1] -= area(2 * numDoors, 0.9 * numDoors);
                     totalPaint -= calculatePaintForWall(2 * numDoors * 0.9 * numDoors);
                 }
             }
@@ -370,7 +373,7 @@ function run() {
                             shape = getShape(`What is the shape of window ${k + 1}? [QUAD,CIRCLE] `);
                         console.log(`Dimentions of window ${k + 1}: `);
                         let windowArea = getShapeArea(shape);
-                        brand.colours[colourindex][1] -= windowArea;
+                        colours[colourindex][1] -= windowArea;
                         totalPaint -= calculatePaintForWall(windowArea);
                     }
                 }
@@ -386,9 +389,9 @@ function run() {
                     let width: number = getNumber(`What is the WIDTH of area ${count} to exclude?`);
                     let height: number = getNumber(`What is the HEIGHT of area ${count} to exclude?`);
                     wall.excludeArea += area(width, height);
-                    brand.colours[colourindex][1] -= area(width, height);
+                    colours[colourindex][1] -= area(width, height);
                     end = !getBool("Are there any more areas to exclude? [YES,NO] ");
-                    console.log(wall.excludeArea);
+                    
                 }
             }
 
@@ -398,7 +401,15 @@ function run() {
     }
 
     console.log("");
-    calculateCost(brand);
+    console.log("Options:");
+    console.log("---------------DULUX---------------");
+    calculateCost(dulux);
+    console.log("");
+    console.log("--------------GOODHOME-------------");
+    calculateCost(goodHome);
+    console.log("");
+    console.log("--------------SANDTEX--------------");
+    calculateCost(sandtex);
 
 }
 
