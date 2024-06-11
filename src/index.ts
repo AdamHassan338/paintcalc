@@ -235,7 +235,7 @@ export function calculateCost(brand: Brand): number {
         remainder -= 2.5 * two;
 
         one = Math.ceil(remainder);
-        console.log(`${brand.name} ${brand.colours[i][0]} ${brand.colours[i][1]}Liters `)
+        console.log(`${brand.name} ${brand.colours[i][0]} ${Math.round((brand.colours[i][1] * 100) / 100).toFixed(2)} Liters `)
 
 
         if (ten > 0) {
@@ -259,8 +259,8 @@ export function calculateCost(brand: Brand): number {
         total += five * 5 * brand.prices[1];
         total += two * 2.5 * brand.prices[2];
         total += one * 1 * brand.prices[3];
-
-
+        
+    
     }
 
     console.log(`Total: £${(Math.round(total * 100) / 100).toFixed(2)}`)
@@ -374,7 +374,8 @@ function run() {
         }
 
     }
-    console.log(brand.colours);
+
+    console.log("");
     calculateCost(brand);
 
 }

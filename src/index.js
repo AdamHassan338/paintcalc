@@ -181,7 +181,7 @@ function calculateCost(brand) {
         two = Math.floor(remainder / 2.5);
         remainder -= 2.5 * two;
         one = Math.ceil(remainder);
-        console.log(`${brand.name} ${brand.colours[i][0]} ${brand.colours[i][1]}Liters `);
+        console.log(`${brand.name} ${brand.colours[i][0]} ${Math.round((brand.colours[i][1] * 100) / 100).toFixed(2)} Liters `);
         if (ten > 0) {
             cost = (Math.round(ten * 10 * brand.prices[0] * 100) / 100).toFixed(2);
             console.log(`- ${ten} x 10L Tins = £${cost}`);
@@ -294,7 +294,7 @@ function run() {
             walls.push(wall);
         }
     }
-    console.log(brand.colours);
+    console.log("");
     calculateCost(brand);
 }
 run();
